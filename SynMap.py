@@ -15,6 +15,13 @@ import os
 
 import unicodedata
 
+# Importa fuzzywuzzy para mapeamento por similaridade
+try:
+    from fuzzywuzzy import fuzz, process
+except ImportError:
+    fuzz = None
+    process = None
+
 # Tenta importar o psycopg2 para conexão com PostGIS
 try:
     import psycopg2
@@ -93,6 +100,8 @@ def auto_map_attributes_with_synonyms(model_attributes, layer_fields, synonyms_d
     Mapeia atributos do modelo para os campos da camada de entrada usando correspondência fuzzy.
     Utiliza os sinônimos fornecidos no dicionário synonyms_dict.
     """
+    if fuzz is None or process is None:
+        raise ImportError("fuzzywuzzy não está disponível para mapeamento automático")
     normalized_layer_fields = [(field, normalize_str(field)) for field in layer_fields]
     normalized_fields = [norm for _, norm in normalized_layer_fields]
     mapping = {}
@@ -745,14 +754,12 @@ class MappingPage(QWizardPage):
         - Chama a função de mapeamento
         - Atualiza a tabela ou exibe warning
         """
-        # ─── 1) Importa fuzz e process ──────────────────────────────
-        try:
-            from fuzzywuzzy import fuzz, process
-        except ImportError as e:
+        # ─── 1) Verifica se fuzzywuzzy está disponível ───────────────
+        if fuzz is None or process is None:
             QMessageBox.warning(
                 self,
                 "Mapeamento Automático",
-                f"Biblioteca fuzzywuzzy não encontrada:\n{e}\n"
+                "Biblioteca fuzzywuzzy não encontrada.\n"
                 "Verifique a instalação do plugin SynMap."
             )
             return
