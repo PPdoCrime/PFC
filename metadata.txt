@@ -1,0 +1,9 @@
+[general]
+name=EDGVMappingWizard
+qgisMinimumVersion=3.0
+description=Plugin para mapeamento de atributos EDGV a partir de um arquivo SQL e de uma camada de entrada.
+version=1.0
+author=Seu Nome
+email=seu.email@exemplo.com
+category=Geoprocessamento
+homepage=https://seusite.com
